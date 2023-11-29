@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -33,11 +35,12 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   IconData lastIconClicked = Icons.notifications;
 
   final List<IconData> menuItem = <IconData>[
-    Icons.menu,
+    //Icons.menu,
     Icons.home,
     Icons.add_alert,
     Icons.search,
     Icons.satellite_alt,
+    Icons.menu
   ];
 
   @override
@@ -112,7 +115,7 @@ class FlowMenuDelegate extends FlowDelegate {
 
     //--------------Bottom show --------------
 
-    final size = context.size;
+    /*final size = context.size;
     final xStart = size.width - 80;
     final yStart = size.height - 80;
     for (int i = context.childCount - 1; i >=0; i--) {
@@ -122,7 +125,39 @@ class FlowMenuDelegate extends FlowDelegate {
       final x = xStart;  // Horizontal ( - dx )
       final y = yStart - dx * menuAnimation.value;  // Vertical ( - dx )
       context.paintChild(i, transform: Matrix4.translationValues(x, y, 0)); // Main Line of icon position
+    }*/
+
+
+    //-------------Rounded Show ------------------
+
+    final size = context.size;
+    final xStart = size.width - 80;
+    final yStart = size.height - 80;
+    final n = context.childCount;
+    for(int i = 0 ; i<n ; i++){
+
+      final isLastItem = i == context.childCount - 1 ;
+      final setValue = (value) => isLastItem ? 0.0 : value;
+
+      final radius = 180 * menuAnimation.value;
+
+      final theta = i * pi * 0.5 / (n-2);
+      final x = xStart - setValue(radius * cos(theta));
+      final y = yStart - setValue(radius * sin(theta));
+
+      context.paintChild(
+          i,
+          transform: Matrix4.identity()
+            ..translate(x,y,0)
+            ..translate(80 / 2,80 / 2)
+            ..rotateZ(isLastItem ? 0.0 : 180 * (1-menuAnimation.value) * pi / 180)
+            ..scale(isLastItem ? 1.0 : max(menuAnimation.value,0.5))
+            ..translate(-80/2,-80/2)
+
+      );
+
     }
+
 
   }
 }
